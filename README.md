@@ -11,7 +11,7 @@ Explore the live website at [BadMatTon](https://badmatton.vercel.app/).
 ## Features ✨
 
 ### Core Functionality
-- **Dual Group Management**: Handle 2 separate tournament groups
+- **Dual Group Management**: Handle 2 separate groups
   - Group 1: `participants_1` & `waiting_list_1`
   - Group 2: `participants_2` & `waiting_list_2`
 - **Real-time Updates**: Instant synchronization across devices
