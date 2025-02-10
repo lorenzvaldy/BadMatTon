@@ -293,7 +293,7 @@ export function useSupabase() {
 
   // Update other functions to accept groupNumber parameter
   const deleteParticipant = async (id, groupNumber,waiting) => {
-    if (!window.confirm("Please confirm that this is you, and do not remove other names without permission. 🙏")) {
+    if (!window.confirm("Please confirm that this is you, and do not remove other name without permission 😢🙏")) {
       return;
     }
     // Use group-specific tables
