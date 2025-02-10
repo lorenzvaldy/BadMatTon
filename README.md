@@ -82,10 +82,7 @@ REACT_APP_SUPABASE_ANON_KEY=your-anon-key
   ```
 
 - Create 1 table for variables
-  - `participants_1`
-  - `waiting_list_1`
-  - `participants_2`
-  - `waiting_list_2`
+  - `variables`
   
   With columns:
   ```sql
@@ -115,31 +112,6 @@ npm start
 3. **Group Navigation**
    - Separate sections for Group 1 & Group 2
    - Identical functionality for both groups
-
-## Database Structure 🗃️
-
-```sql
--- Group 1 Tables
-CREATE TABLE participants_1 (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  has_paid BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE waiting_list_1 (
-  -- Same structure as participants_1
-);
-
--- Group 2 Tables
-CREATE TABLE participants_2 (
-  -- Same structure as participants_1
-);
-
-CREATE TABLE waiting_list_2 (
-  -- Same structure as participants_1
-);
-```
 
 **Key Implementation Details**
 - State management with React hooks
