@@ -226,6 +226,64 @@ tr:last-child {
   color: white;
 }
 
+/* Group Containers */
+.tournament-group {
+  margin: 3rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.tournament-group:nth-child(odd) {
+  border: 2px solid var(--court-green);
+}
+
+.tournament-group:nth-child(even) {
+  border: 2px solid var(--feather-red);
+}
+
+.group-title {
+  color: var(--racket-black);
+  margin-top: 0;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.group-container {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.waiting-list {
+  border: 2px dashed var(--shuttlecock-orange) !important;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;  /* Changed from center to baseline */
+  padding: 0 1;       /* Add padding to match text alignment */            
+  line-height: 1;        /* Ensure consistent line height */
+}
+
+.move-button {
+  background-color: rgb(245, 235, 235);
+  border: 1px solid red;
+  color: red;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  float: right; /* Align the button to the right side */
+}
+
+.move-button:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .event-title {

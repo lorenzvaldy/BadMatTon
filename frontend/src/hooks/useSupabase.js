@@ -3,112 +3,169 @@ import { supabase } from '../supabase'
 
 const MAX_PARTICIPANTS = 10
 
-export function useSupabase() {
-  const [mainList, setMainList] = useState([])
-  const [waitingList, setWaitingList] = useState([])
-
-   // Initialize database tables
-   const initializeDB = async () => {
-    try {
-      // Create participants table
-      await supabase.rpc(`
-        CREATE TABLE IF NOT EXISTS participants (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          has_paid BOOLEAN DEFAULT false,
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-      `);
-
-      // Create waiting_list table
-      await supabase.rpc(`
-        CREATE TABLE IF NOT EXISTS waiting_list (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          has_paid BOOLEAN DEFAULT false,
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-      `);
-
-      console.log("Tables initialized successfully");
-    } catch (error) {
-      console.error("Error initializing tables:", error);
+async function clearTable(tableName) {
+  try {
+    const { error } = await supabase
+      .from(tableName)
+      .delete()
+      .not('id', 'is', null)
+    
+    if (error) {
+      throw error
     }
+    
+    console.log('Table cleared successfully')
+    // Add your success handling here (e.g., refresh UI, show message)
+    
+  } catch (error) {
+    console.error('Error clearing table:', error.message)
+    // Add your error handling here
+  }
+}
+
+export function useSupabase() {
+  const [groups, setGroups] = useState({
+    group1: {
+      main: [],
+      waiting: []
+    },
+    group2: {
+      main: [],
+      waiting: []
+    },
+  })
+
+  const fetchGroupData = async (groupNumber) => {
+    const main = await supabase
+      .from(`participants_${groupNumber}`)
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    const waiting = await supabase
+      .from(`waiting_list_${groupNumber}`)
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    setGroups(prev => ({
+      ...prev,
+      [`group${groupNumber}`]: {
+        main: main.data || [],
+        waiting: waiting.data || []
+      }
+    }));
   };
 
-
-  // Load initial data
+  // Real-time updates using fetchGroupData
   useEffect(() => {
-    fetchParticipants()
-    fetchWaitingList()
-  }, [])
-
-  // Real-time updates
-  useEffect(() => {
-    const participantsSub = supabase
-      .channel('custom-all-channel')
+    const participants_1Sub = supabase
+      .channel('custom-group1-participants')
       .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'participants' },
-        () => fetchParticipants()
+        { event: '*', schema: 'public', table: 'participants_1' },
+        () => fetchGroupData(1)
       )
       .subscribe()
 
-    const waitingSub = supabase
-      .channel('custom-waiting-channel')
+    const waiting_1Sub = supabase
+      .channel('custom-group1-waiting')
       .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'waiting_list' },
-        () => fetchWaitingList()
+        { event: '*', schema: 'public', table: 'waiting_list_1' },
+        () => fetchGroupData(1)
+      )
+      .subscribe()
+
+    const participants_2Sub = supabase
+      .channel('custom-group2-participants')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'participants_2' },
+        () => fetchGroupData(2)
+      )
+      .subscribe()
+
+    const waiting_2Sub = supabase
+      .channel('custom-group2-waiting')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'waiting_list_2' },
+        () => fetchGroupData(2)
       )
       .subscribe()
 
     return () => {
-      participantsSub.unsubscribe()
-      waitingSub.unsubscribe()
+      participants_1Sub.unsubscribe()
+      waiting_1Sub.unsubscribe()
+      participants_2Sub.unsubscribe()
+      waiting_2Sub.unsubscribe()
     }
   }, [])
 
-  const fetchParticipants = async () => {
-    const { data, error } = await supabase
-      .from('participants')
-      .select('*')
-      .order('created_at', { ascending: true })
 
-    if (!error) setMainList(data)
-  }
+  useEffect(() => {
+    fetchGroupData(1);
+    fetchGroupData(2);
+  }, []);
 
-  const fetchWaitingList = async () => {
-    const { data, error } = await supabase
-      .from('waiting_list')
-      .select('*')
-      .order('created_at', { ascending: true })
+  const moveGroup1ToGroup2 = async () => {
+    try {
+      // Clear group 2 tables
+      await clearTable('participants_2');
+      await clearTable('waiting_list_2');
 
-    if (!error) setWaitingList(data)
-  }
+      // Move main participants from group 1 to group 2
+      if (groups.group1.main.length > 0) {
+        await supabase
+          .from('participants_2')
+          .insert(groups.group1.main.map(({ name, has_paid }) => ({ name, has_paid })));
+      }
 
-  const addParticipant = async (name) => {
+      // Move waiting list participants from group 1 to group 2
+      if (groups.group1.waiting.length > 0) {
+        await supabase
+          .from('waiting_list_2')
+          .insert(groups.group1.waiting.map(({ name, has_paid }) => ({ name, has_paid })));
+      }
+
+      // Optionally clear group 1 in state
+      setGroups(prev => ({
+        ...prev,
+        group1: { main: [], waiting: [] }
+      }));
+
+      await clearTable('participants_1');
+      await clearTable('waiting_list_1');
+
+      // Refresh the data for group 2
+      fetchGroupData(2);
+    } catch (error) {
+      console.error('Error moving group1 to group2:', error);
+    }
+  };
+
+  const addParticipant = async (name, groupNumber) => {
+    // Similar to previous logic but using group-specific tables
+    const tableName = `participants_${groupNumber}`;
+    const waitingTable = `waiting_list_${groupNumber}`;
     try {
       // Check if tables exist
       const { error: tableError } = await supabase
-        .from('participants')
+        .from(tableName)
         .select('*')
         .limit(1);
 
       if (tableError) {
-        await initializeDB(); // Auto-create tables if they don't exist
+        console.error("Table does not exist: ", tableError);
       }
 
       // Rest of your existing addParticipant logic
       const { count } = await supabase
-        .from('participants')
+        .from(tableName)
         .select('*', { count: 'exact' });
 
       if (count < MAX_PARTICIPANTS) {
         await supabase
-          .from('participants')
+          .from(tableName)
           .insert([{ name }]);
       } else {
         await supabase
-          .from('waiting_list')
+          .from(waitingTable)
           .insert([{ name }]);
       }
     } catch (error) {
@@ -116,48 +173,53 @@ export function useSupabase() {
     }
   };
 
-  const togglePayment = async (id) => {
-    const participant = mainList.find(p => p.id === id)
+  const togglePayment = async (id,groupNumber) => {
+    const mainTable = `participants_${groupNumber}`;
+    const participant = groups[`group${groupNumber}`].main.find(p => p.id === id)
     if (!participant) return
 
     await supabase
-      .from('participants')
+      .from(mainTable)
       .update({ has_paid: !participant.has_paid })
       .eq('id', id)
   }
 
-  const deleteParticipant = async (id,waiting) => {
+  // Update other functions to accept groupNumber parameter
+  const deleteParticipant = async (id, groupNumber,waiting) => {
+    // Use group-specific tables
+    const mainTable = `participants_${groupNumber}`;
+    const waitingTable = `waiting_list_${groupNumber}`;
     if(waiting){
       // Delete from waiting list
       await supabase
-        .from('waiting_list')
+        .from(waitingTable)
         .delete()
         .eq('id', id)
     }else{
         // Delete from main list
         await supabase
-        .from('participants')
+        .from(mainTable)
         .delete()
         .eq('id', id)
 
         // Promote from waiting list if needed
-        if (mainList.length - 1 < MAX_PARTICIPANTS && waitingList.length > 0) {
-        const [firstWaiting] = waitingList
+        if (groups[`group${groupNumber}`].main.length - 1 < MAX_PARTICIPANTS && groups[`group${groupNumber}`].waiting.length > 0) {
+        const [firstWaiting] = groups[`group${groupNumber}`].waiting
         
         await supabase
-            .from('participants')
+            .from(mainTable)
             .insert([{
             name: firstWaiting.name,
             has_paid: firstWaiting.has_paid
             }])
 
         await supabase
-            .from('waiting_list')
+            .from(waitingTable)
             .delete()
             .eq('id', firstWaiting.id)
         }
     }
   }
 
-  return { mainList, waitingList, addParticipant, togglePayment, deleteParticipant };
+  return { groups, addParticipant, deleteParticipant, togglePayment,moveGroup1ToGroup2};
 }

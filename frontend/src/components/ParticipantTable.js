@@ -1,5 +1,5 @@
 import '../styles.css';
-const ParticipantTable = ({ participants, title, onToggle, onDelete, isWaitingList }) => {
+const ParticipantTable = ({participants, title, onToggle, onDelete, isWaitingList, groupNumber}) => {
   return (
       <div className="shuttle-table">
         <h1 className="table-title">
@@ -22,7 +22,7 @@ const ParticipantTable = ({ participants, title, onToggle, onDelete, isWaitingLi
                     <td>
                       <button 
                         className={`payment-toggle ${participant.has_paid ? 'paid' : 'unpaid'}`}
-                        onClick={() => onToggle(participant.id)}
+                        onClick={() => onToggle(participant.id,groupNumber)}
                       >
                         {participant.has_paid ? '✅ Paid' : '❌ Unpaid'}
                       </button>
@@ -32,7 +32,7 @@ const ParticipantTable = ({ participants, title, onToggle, onDelete, isWaitingLi
                     <td>
                       <button 
                         className="delete" 
-                        onClick={() => onDelete(participant.id)}
+                        onClick={() => onDelete(participant.id,groupNumber)}
                       >
                         Delete
                       </button>
