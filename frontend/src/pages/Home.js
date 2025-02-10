@@ -1,13 +1,13 @@
-import { useSupabase } from '../hooks/useSupabase'
-import ParticipantTable from '../components/ParticipantTable'
-import ParticipantForm from '../components/ParticipantForm'
+import { useSupabase } from '../hooks/useSupabase';
+import ParticipantTable from '../components/ParticipantTable';
+import ParticipantForm from '../components/ParticipantForm';
 import { useState } from 'react';
 import '../styles.css';
 
-
 const Home = () => {
-  const { groups, addParticipant, deleteParticipant, togglePayment, moveGroup1ToGroup2,ChangeMaxParticipants,MAX_PARTICIPANTS,getCurrentMaxParticipants} = useSupabase();
+  const { groups, addParticipant, deleteParticipant, togglePayment, moveGroup1ToGroup2, ChangeMaxParticipants, MAX_PARTICIPANTS, getCurrentMaxParticipants } = useSupabase();
   const [newMax, setNewMax] = useState(MAX_PARTICIPANTS);
+
   const handleMaxParticipantsSubmit = (e) => {
     e.preventDefault();
     const password = prompt(`Change the maximum participants to join \n\nEnter password:`);
@@ -20,16 +20,16 @@ const Home = () => {
 
   return (
     <div className="badminton-container-2">
-        <form className="max-participants-form" onSubmit={handleMaxParticipantsSubmit}>
-          <label htmlFor="maxParticipants"></label>
-          <input
-            id="maxParticipants"
-            type="number"
-            placeholder="Enter max participants"
-            onChange={(e) => setNewMax(e.target.value)}
-          />
-          <button type="submit">🔒 Update</button>
-        </form>
+      <form className="max-participants-form" onSubmit={handleMaxParticipantsSubmit}>
+        <label htmlFor="maxParticipants"></label>
+        <input
+          id="maxParticipants"
+          type="number"
+          placeholder="Enter max participants"
+          onChange={(e) => setNewMax(e.target.value)}
+        />
+        <button type="submit">🔒 Update</button>
+      </form>
       {/* Group 1 */}
       <div className="tournament-group">
         <div className="form-header">
@@ -61,7 +61,7 @@ const Home = () => {
         <ParticipantTable
           participants={groups.group1.waiting}
           title={`Waiting List (${groups.group1.waiting.length})`}
-          onDelete={() => {deleteParticipant(groups.group1.waiting[0].id, 1,true)}}
+          onDelete={(id) => deleteParticipant(id, 1, true)}
           onToggle={togglePayment}
           isWaitingList={true}
           groupNumber={1}
