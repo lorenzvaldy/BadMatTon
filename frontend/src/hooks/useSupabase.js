@@ -37,21 +37,89 @@ export function useSupabase() {
   const getCurrentMaxParticipants = () => MAX_PARTICIPANTS;
   const ChangeMaxParticipants = async (newMax) => {
     try {
-      const { error } = await supabase
+      // Update the MAX_PARTICIPANTS variable in the database
+      const { error: updateError } = await supabase
         .from('variables')
         .update({ value: newMax })
-        .eq('variable_name', 'MAX_PARTICIPANTS')
-      if (error) {
-        throw error
+        .eq('variable_name', 'MAX_PARTICIPANTS');
+  
+      if (updateError) throw updateError;
+  
+      // Process each group to move excess participants to the waiting list
+      for (const groupNumber of [1, 2]) {
+        // Fetch current main participants ordered by creation time (oldest first)
+        const { data: mainParticipants, error: fetchError } = await supabase
+          .from(`participants_${groupNumber}`)
+          .select('*')
+          .order('created_at', { ascending: true });
+  
+        if (fetchError) throw fetchError;
+  
+        const currentCount = mainParticipants.length;
+        if (currentCount > newMax) {
+          const excess = currentCount - newMax;
+          // Get the last 'excess' participants (newest in the main list)
+          const participantsToMove = mainParticipants.slice(-excess);
+  
+          if (participantsToMove.length > 0) {
+            // Insert into waiting list with current timestamp (do not specify created_at)
+            const { error: insertError } = await supabase
+              .from(`waiting_list_${groupNumber}`)
+              .insert(participantsToMove.map(p => ({ name: p.name, has_paid: p.has_paid })));
+  
+            if (insertError) throw insertError;
+  
+            // Delete moved participants from the main list
+            const participantIds = participantsToMove.map(p => p.id);
+            const { error: deleteError } = await supabase
+              .from(`participants_${groupNumber}`)
+              .delete()
+              .in('id', participantIds);
+  
+            if (deleteError) throw deleteError;
+          }
+        }else{
+          // Check if there are any participants in the waiting list
+          const { data: waitingParticipants, error: fetchWaitingError } = await supabase
+            .from(`waiting_list_${groupNumber}`)
+            .select('*')
+            .order('created_at', { ascending: true });
+  
+          if (fetchWaitingError) throw fetchWaitingError;
+  
+          const waitingCount = waitingParticipants.length;
+          if (currentCount < newMax && waitingCount > 0) {
+            const toPromote = newMax - currentCount;
+            const participantsToPromote = waitingParticipants.slice(0, toPromote);
+  
+            if (participantsToPromote.length > 0) {
+              // Insert into main list with current timestamp (do not specify created_at)
+              const { error: insertError } = await supabase
+                .from(`participants_${groupNumber}`)
+                .insert(participantsToPromote.map(p => ({ name: p.name, has_paid: p.has_paid })));
+  
+              if (insertError) throw insertError;
+  
+              // Delete promoted participants from the waiting list
+              const participantIds = participantsToPromote.map(p => p.id);
+              const { error: deleteError } = await supabase
+                .from(`waiting_list_${groupNumber}`)
+                .delete()
+                .in('id', participantIds);
+  
+              if (deleteError) throw deleteError;
+            }
+          }
+        }
       }
-      setMaxParticipants(newMax)
-      console.log('Max participants updated successfully')
-      // Add your success handling here (e.g., refresh UI, show message)
+  
+      // Update the state with the new max value
+      setMaxParticipants(newMax);
+      console.log('Max participants updated and excess moved to waiting lists');
     } catch (error) {
-      console.error('Error updating max participants:', error.message)
-      // Add your error handling here
+      console.error('Error updating max participants:', error.message);
     }
-  }
+  };
 
   const [groups, setGroups] = useState({
     group1: {

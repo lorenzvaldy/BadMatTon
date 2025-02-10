@@ -28,7 +28,6 @@ body {
   max-width: 100%;
   padding: 2rem;
   background-color: #a3b18a;
-  min-height: 100vh;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
   border-radius: 12px;
 }
@@ -140,7 +139,7 @@ body {
 }
 
 .main-list {
-  background: #cccac2;
+  background: #e0dfd7;
   border-radius: var(--border-radius);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   margin: auto;
@@ -183,7 +182,7 @@ th {
 }
 
 td {
-  border-bottom: 1px solid #b4b2ab;
+  border-bottom: 1px solid #d4d1c2;
 }
 
 tr:last-child {
@@ -270,7 +269,7 @@ tr:last-child {
 }
 
 .move-button {
-  background-color: rgb(245, 235, 235);
+  background-color: rgb(238, 209, 209);
   border: 1px solid red;
   color: red;
   padding: 5px 10px;

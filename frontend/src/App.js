@@ -30,7 +30,6 @@ function App() {
           <input
             id="maxParticipants"
             type="number"
-            value={newMax}
             placeholder="Enter max participants"
             onChange={(e) => setNewMax(e.target.value)}
           />
