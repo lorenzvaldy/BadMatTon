@@ -293,6 +293,9 @@ export function useSupabase() {
 
   // Update other functions to accept groupNumber parameter
   const deleteParticipant = async (id, groupNumber,waiting) => {
+    if (!window.confirm("Please confirm that this is you, and do not remove other names without permission. 🙏")) {
+      return;
+    }
     // Use group-specific tables
     const mainTable = `participants_${groupNumber}`;
     const waitingTable = `waiting_list_${groupNumber}`;
