@@ -2,7 +2,7 @@
 
 ![Logo](/logo.png)
 
-A web application for managing badminton tournament registrations featuring real-time updates and automatic waiting list management.
+A web application for managing badminton registration featuring real-time updates and automatic waiting list management.
 
 ## Live Demo
 
