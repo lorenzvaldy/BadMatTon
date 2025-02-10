@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 
-const MAX_PARTICIPANTS = 10
-
 async function clearTable(tableName) {
   try {
     const { error } = await supabase
@@ -24,6 +22,37 @@ async function clearTable(tableName) {
 }
 
 export function useSupabase() {
+  const [MAX_PARTICIPANTS, setMaxParticipants] = useState(0);
+  const fetchMaxParticipants = async () => {
+    const { data, error } = await supabase
+      .from('variables')
+      .select('value')
+      .eq('variable_name', 'MAX_PARTICIPANTS')
+    if (error) {
+      console.error('Error fetching max participants:', error.message)
+      return
+    }
+    setMaxParticipants(data[0].value)
+  }
+  const getCurrentMaxParticipants = () => MAX_PARTICIPANTS;
+  const ChangeMaxParticipants = async (newMax) => {
+    try {
+      const { error } = await supabase
+        .from('variables')
+        .update({ value: newMax })
+        .eq('variable_name', 'MAX_PARTICIPANTS')
+      if (error) {
+        throw error
+      }
+      setMaxParticipants(newMax)
+      console.log('Max participants updated successfully')
+      // Add your success handling here (e.g., refresh UI, show message)
+    } catch (error) {
+      console.error('Error updating max participants:', error.message)
+      // Add your error handling here
+    }
+  }
+
   const [groups, setGroups] = useState({
     group1: {
       main: [],
@@ -88,12 +117,21 @@ export function useSupabase() {
         () => fetchGroupData(2)
       )
       .subscribe()
+    
+    const maxParticipantSub = supabase
+      .channel('custom-max-participants')
+      .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'variables', filter: "value=MAX_PARTICIPANTS" },
+      () => fetchMaxParticipants()
+      )
+      .subscribe()
 
     return () => {
       participants_1Sub.unsubscribe()
       waiting_1Sub.unsubscribe()
       participants_2Sub.unsubscribe()
       waiting_2Sub.unsubscribe()
+      maxParticipantSub.unsubscribe()
     }
   }, [])
 
@@ -101,6 +139,7 @@ export function useSupabase() {
   useEffect(() => {
     fetchGroupData(1);
     fetchGroupData(2);
+    fetchMaxParticipants();
   }, []);
 
   const moveGroup1ToGroup2 = async () => {
@@ -217,9 +256,11 @@ export function useSupabase() {
             .from(waitingTable)
             .delete()
             .eq('id', firstWaiting.id)
+        
+        window.alert(`Remind ${firstWaiting.name} that they have been promoted from the waiting list`)
         }
     }
   }
 
-  return { groups, addParticipant, deleteParticipant, togglePayment,moveGroup1ToGroup2};
+  return { groups, addParticipant, deleteParticipant, togglePayment,moveGroup1ToGroup2,ChangeMaxParticipants,MAX_PARTICIPANTS,getCurrentMaxParticipants};
 }
