@@ -1,19 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
+import '../styles.css';
 
-const ParticipantForm = ({ currentName, setCurrentName, onSubmit }) => {
+const ParticipantForm = ({ onSubmit }) => {
+  const [name, setName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(name.trim());
+      setName('');
+    } catch (error) {
+      console.error('Error adding participant:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="form-container">
-      <input
-        type="text"
-        value={currentName}
-        onChange={(e) => setCurrentName(e.target.value)}
-        placeholder="Enter name"
-        onKeyPress={(e) => e.key === 'Enter' && onSubmit()}
-      />
-      <button className="button-container" onClick={onSubmit}>
-        Add Participant
-      </button>
-    </div>
+    <form className="badminton-form" onSubmit={handleSubmit}>
+      <div className="form-group">
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter player name"
+          className="shuttle-input"
+          disabled={isSubmitting}
+        />
+        <button 
+          type="submit" 
+          className="smash-button"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Adding...' : 'Add Player'}
+        </button>
+      </div>
+    </form>
   );
 };
 
