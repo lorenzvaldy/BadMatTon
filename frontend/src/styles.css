@@ -16,49 +16,55 @@ body {
   line-height: 1.5;
   background-color: var(--background-light);
   color: var(--primary-color);
+  margin: 0;
+  padding: 5px;
+  display: flex; /* Enable Flexbox */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  min-height: 100vh; /* Ensure the body takes up the full viewport height */
 }
-
 /* Container */
 .badminton-container {
-  max-width: 1000px;
-  margin: 1.5rem auto; 
+  max-width: 100%;
   padding: 2rem;
   background-color: #a3b18a;
   min-height: 100vh;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
-  border-radius: 1rem;
+  border-radius: 12px;
+}
+
+.event-logo {
+  width: 100%; /* Adjust width based on badminton container */
+  height: 100%;
+  max-width: 200px; /* Limit width for smaller screens */
+  max-width: 500px; /* Limit width for larger screens */
+  margin: 0 auto;
+  display: block;
 }
 
 /* Header */
 .event-header {
   text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.event-title {
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  margin-bottom: 1.5rem;
 }
 
 /* Form Styles */
 .badminton-form {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   background: #dad7cd;
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: var(--border-radius);
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .form-group {
   display: flex;
+  flex-direction: column; /* Stack inputs vertically on mobile */
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .shuttle-input {
-  flex: 1 1 300px;
+  width: auto; /* Full width on mobile */
   padding: 0.75rem 1rem;
   border: 1px solid #e2e8f0;
   border-radius: var(--border-radius);
@@ -81,7 +87,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  flex-shrink: 0;
+  width: 100%; /* Full width on mobile */
 }
 
 .smash-button:disabled {
@@ -94,25 +100,24 @@ body {
 }
 
 /* Table Styles */
-/* ===== PARTICIPANT TABLE ===== */
 .shuttle-table-container {
-  margin: 2rem 0;
+  margin: 1rem 0;
   background: white;
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  max-height: 600px; /* Shows ~10 rows */
-  position: relative;
+  min-height: auto;
+  max-height: auto;
+  overflow-y: auto;
 }
 
 .shuttle-table {
   background: #cccac2;
   border-radius: var(--border-radius);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  padding: 1rem;
-  margin: auto;
-  max-height: 600px;
-  width: 45%;
+  padding: 0.5rem;
+  margin: 0.5rem;
+  width: auto; /* Full width on mobile */
 }
 
 /* Sticky header */
@@ -124,15 +129,14 @@ body {
 
 /* Fixed row height for consistent scrolling */
 .shuttle-table tbody tr {
-  height: 20px; /* Adjust based on your needs */
+  height: auto; /* Allow rows to adjust height */
 }
 
-/* Optional: Add scrollbar styling */
-
-.table-title{
-  padding: 1.25rem 1.5rem;
+.table-title {
+  text-align: center;
+  padding: 1rem;
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 1.5rem; /* Smaller font size for mobile */
 }
 
 .main-list {
@@ -140,13 +144,13 @@ body {
   border-radius: var(--border-radius);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   margin: auto;
-  max-height: 400px;
+  max-height: 300px; /* Smaller height for mobile */
   overflow-y: auto;
   width: 100%;
 }
 
 .main-list::-webkit-scrollbar {
-  width: 8px;
+  width: 6px; /* Thinner scrollbar for mobile */
 }
 
 .main-list::-webkit-scrollbar-track {
@@ -166,11 +170,10 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  max-width: 600px;
 }
 
 th, td {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem; /* Smaller padding for mobile */
   text-align: left;
 }
 
@@ -226,15 +229,33 @@ tr:last-child {
 /* Responsive Design */
 @media (max-width: 768px) {
   .event-title {
-    font-size: 2rem;
+    font-size: 1.75rem; /* Adjust for smaller screens */
   }
-  
-  .form-group {
-    flex-direction: column;
+
+  .badminton-container {
+    padding: 1rem; /* Less padding on mobile */
   }
-  
+
+  .main-list {
+    max-height: 225px; /* Smaller height for mobile */
+  }
+
+  th, td {
+    padding: 0.5rem; /* Smaller padding for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .event-title {
+    font-size: 1.5rem; /* Even smaller font size for very small screens */
+  }
+
   .shuttle-input,
   .smash-button {
-    width: 100%;
+    font-size: 0.9rem; /* Smaller font size for inputs and buttons */
+  }
+
+  .table-title {
+    font-size: 1.25rem; /* Smaller font size for table title */
   }
 }

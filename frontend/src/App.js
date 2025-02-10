@@ -16,7 +16,7 @@ function App() {
         />
       </header>
       <ParticipantForm onSubmit={addParticipant} />
-      <div className="shuttle-table-container" style={{ display: 'flex', justifyContent: 'start' }}>
+      <div className="shuttle-table-container">
         <ParticipantTable
           participants={mainList}
           title={`Main List (${mainList.length}/10)`}
