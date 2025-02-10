@@ -47,7 +47,7 @@ Explore the live website at [BadMatTon](https://badmatton.vercel.app/).
 1. **Clone Repository**
 ```bash
 git clone https://https://github.com/lorenzvaldy/BadMatTon.git
-cd badminton-tournament
+cd BadMatTon/frontend/
 ```
 
 2. **Install Dependencies**
