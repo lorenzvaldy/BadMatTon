@@ -11,7 +11,7 @@ const About = () => {
         The event is held at the <strong>Badminton-Center Mörsenbroich eK</strong> every Saturday if possible.</p>
       <Map apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}/>
       <p className="about-info">This web provides an overview of the event details and information.
-        For contributions, please visit our{' '}
+        For contributions, please visit {' '}
         <a href="https://github.com/lorenzvaldy/BadMatTon" target="_blank" rel="noopener noreferrer">
           GitHub repository
         </a>.</p>
