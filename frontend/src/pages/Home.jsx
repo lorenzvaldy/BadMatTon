@@ -11,7 +11,7 @@ const Home = () => {
   const handleMaxParticipantsSubmit = (e) => {
     e.preventDefault();
     const password = prompt(`Change the maximum participants to join \n\nEnter password:`);
-    if (password === process.env.REACT_APP_RESET_PASSWORD) {
+    if (password === import.meta.env.VITE_RESET_PASSWORD) {
       ChangeMaxParticipants(newMax);
     } else {
       alert("Incorrect password!");
@@ -38,7 +38,7 @@ const Home = () => {
             className="move-button"
             onClick={() => {
               const password = prompt(`Clear the current form and move to the old form \n\nEnter password:`);
-              if (password === process.env.REACT_APP_RESET_PASSWORD) {
+              if (password === import.meta.env.VITE_RESET_PASSWORD) {
                 moveGroup1ToGroup2();
               } else {
                 alert("Incorrect password!");

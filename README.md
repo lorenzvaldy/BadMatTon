@@ -61,9 +61,9 @@ cp .env.example .env
 ```
 Fill in your Supabase credentials:
 ```env
-REACT_APP_RESET_PASSWORD=your-password
-REACT_APP_SUPABASE_URL=your-supabase-url
-REACT_APP_SUPABASE_ANON_KEY=your-anon-key
+VITE_RESET_PASSWORD=your-password
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 4. **Database Setup**

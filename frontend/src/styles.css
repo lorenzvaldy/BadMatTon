@@ -393,8 +393,9 @@ tr:last-child {
 
 /* Map Styles */
 .map-container {
-  margin: 2rem 1rem;
-
+  width: 60%;
+  height: 300px;
+  margin: 3rem auto 2rem ; /* Changed margin to auto for horizontal centering */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
