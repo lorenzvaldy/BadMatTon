@@ -31,7 +31,7 @@ const GMap: React.FC<GMapProps> = ({ apiKey }) => {
             <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API has loaded.')}>
                 <Map
                     mapId='BadMatTon'
-                    defaultZoom={0}
+                    defaultZoom={15}
                     defaultCenter={ CENTER }
                     onCameraChanged={ (ev: MapCameraChangedEvent) =>
                         console.log('camera changed:', ev.detail.center, 'zoom:', ev.detail.zoom)
