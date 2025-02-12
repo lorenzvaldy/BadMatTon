@@ -62,10 +62,10 @@ export function useSupabase() {
           const participantsToMove = mainParticipants.slice(-excess);
   
           if (participantsToMove.length > 0) {
-            // Insert into waiting list with current timestamp (do not specify created_at)
+            // Insert into waiting list with current timestamp
             const { error: insertError } = await supabase
               .from(`waiting_list_${groupNumber}`)
-              .insert(participantsToMove.map(p => ({ name: p.name, has_paid: p.has_paid })));
+              .insert(participantsToMove.map(p => ({ name: p.name, has_paid: p.has_paid, created_at: p.created_at })));
   
             if (insertError) throw insertError;
   
@@ -93,10 +93,10 @@ export function useSupabase() {
             const participantsToPromote = waitingParticipants.slice(0, toPromote);
   
             if (participantsToPromote.length > 0) {
-              // Insert into main list with current timestamp (do not specify created_at)
+              // Insert into main list with current timestamp 
               const { error: insertError } = await supabase
                 .from(`participants_${groupNumber}`)
-                .insert(participantsToPromote.map(p => ({ name: p.name, has_paid: p.has_paid })));
+                .insert(participantsToPromote.map(p => ({ name: p.name, has_paid: p.has_paid, created_at: p.created_at })));
   
               if (insertError) throw insertError;
   
